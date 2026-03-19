@@ -6,10 +6,14 @@ import { Button } from "../../components/button";
 import { Input } from "../../components/input";
 import { Textarea } from "../../components/textarea";
 import { Table } from "../../components/table";
-import Badge from "../../components/badge/badge";
-import ExpandTaskForm from "../../components/expand-task-form";
+import { Badge } from "../../components/badge";
+import { ExpandTaskForm } from "../../components/expand-task-form";
 import { useStatusContext } from "../../context";
-import { initialTodos, type TodoItem, type TodoPriority } from "../../context/initialTodos";
+import {
+  initialTodos,
+  type TodoItem,
+  type TodoPriority,
+} from "../../context/initialTodos";
 import type { TableColumn } from "../../components/table";
 import type { BadgeVariant } from "../../components/badge";
 import styles from "./todo-lists.module.css";
@@ -22,7 +26,9 @@ export default function TodoListsPage() {
   const [isCreateFormVisible, setIsCreateFormVisible] = React.useState(false);
   const [newTodoTitle, setNewTodoTitle] = React.useState("");
   const [newTodoDescription, setNewTodoDescription] = React.useState("");
-  const [newTodoPriority, setNewTodoPriority] = React.useState<TodoPriority | "">("");
+  const [newTodoPriority, setNewTodoPriority] = React.useState<
+    TodoPriority | ""
+  >("");
   const [newTodoDueDate, setNewTodoDueDate] = React.useState("");
   const [titleError, setTitleError] = React.useState("");
 
@@ -115,7 +121,11 @@ export default function TodoListsPage() {
     setTodos((prevTodos) => [newTodo, ...prevTodos]);
   };
 
-  const handleSubtaskToggle = (todoId: number, subtaskId: string, completed: boolean) => {
+  const handleSubtaskToggle = (
+    todoId: number,
+    subtaskId: string,
+    completed: boolean
+  ) => {
     setTodos((prevTodos) =>
       prevTodos.map((t) =>
         t.id === todoId
@@ -130,7 +140,12 @@ export default function TodoListsPage() {
     );
   };
 
-  const handleActionToggle = (todoId: number, subtaskId: string, actionId: string, completed: boolean) => {
+  const handleActionToggle = (
+    todoId: number,
+    subtaskId: string,
+    actionId: string,
+    completed: boolean
+  ) => {
     setTodos((prevTodos) =>
       prevTodos.map((t) =>
         t.id === todoId
@@ -141,7 +156,9 @@ export default function TodoListsPage() {
                   ? {
                       ...st,
                       actions: st.actions?.map((action) =>
-                        action.id === actionId ? { ...action, completed } : action
+                        action.id === actionId
+                          ? { ...action, completed }
+                          : action
                       ),
                     }
                   : st
@@ -194,7 +211,7 @@ export default function TodoListsPage() {
                 if (e.key === "Escape") handleCancelCreate();
               }}
             />
-            
+
             <Textarea
               label="Description"
               placeholder="Enter todo description (optional)..."
@@ -207,7 +224,9 @@ export default function TodoListsPage() {
             />
 
             <div className={styles.priorityWrapper}>
-              <label className={styles.priorityLabel}>Priority (optional)</label>
+              <label className={styles.priorityLabel}>
+                Priority (optional)
+              </label>
               <div className={styles.priorityOptions}>
                 <label className={styles.priorityOption}>
                   <input
@@ -215,7 +234,9 @@ export default function TodoListsPage() {
                     name="priority"
                     value="low"
                     checked={newTodoPriority === "low"}
-                    onChange={(e) => setNewTodoPriority(e.target.value as TodoPriority)}
+                    onChange={(e) =>
+                      setNewTodoPriority(e.target.value as TodoPriority)
+                    }
                   />
                   <span className={styles.priorityText}>Low</span>
                 </label>
@@ -225,7 +246,9 @@ export default function TodoListsPage() {
                     name="priority"
                     value="medium"
                     checked={newTodoPriority === "medium"}
-                    onChange={(e) => setNewTodoPriority(e.target.value as TodoPriority)}
+                    onChange={(e) =>
+                      setNewTodoPriority(e.target.value as TodoPriority)
+                    }
                   />
                   <span className={styles.priorityText}>Medium</span>
                 </label>
@@ -235,7 +258,9 @@ export default function TodoListsPage() {
                     name="priority"
                     value="high"
                     checked={newTodoPriority === "high"}
-                    onChange={(e) => setNewTodoPriority(e.target.value as TodoPriority)}
+                    onChange={(e) =>
+                      setNewTodoPriority(e.target.value as TodoPriority)
+                    }
                   />
                   <span className={styles.priorityText}>High</span>
                 </label>
@@ -288,7 +313,11 @@ export default function TodoListsPage() {
                 onSubtaskToggle={(subtaskId: string, completed: boolean) =>
                   handleSubtaskToggle(todo.id, subtaskId, completed)
                 }
-                onActionToggle={(subtaskId: string, actionId: string, completed: boolean) =>
+                onActionToggle={(
+                  subtaskId: string,
+                  actionId: string,
+                  completed: boolean
+                ) =>
                   handleActionToggle(todo.id, subtaskId, actionId, completed)
                 }
               />

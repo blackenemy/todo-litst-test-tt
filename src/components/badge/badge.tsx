@@ -2,12 +2,7 @@ import type { BadgeProps } from "./types";
 import { getBadgeLabel } from "./helpers";
 import styles from "./badge.module.css";
 
-function Badge({
-  variant = "default",
-  label,
-  className,
-  ...rest
-}: BadgeProps) {
+function Badge({ variant = "default", label, className, ...rest }: BadgeProps) {
   const displayLabel = label || getBadgeLabel(variant === "completed");
 
   return (
