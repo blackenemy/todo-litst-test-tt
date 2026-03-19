@@ -1,10 +1,10 @@
 import * as React from "react";
-import { SparklesIcon, CheckCircleIcon } from "@heroicons/react/24/outline";
+import { SparklesIcon, CheckCircleIcon, ArrowPathIcon } from "@heroicons/react/24/outline";
 import { Button } from "../button";
 import { Input } from "../input";
 import type { ExpandTaskFormProps } from "./types";
-import { getTaskPreview } from "../../utils/taskExpander";
-import type { TodoItem } from "../../context/initialTodos";
+import { useTaskExpansion } from "@/hooks";
+import type { TodoItem } from "@/context/initialTodos";
 import styles from "./expand-task-form.module.css";
 
 export default function ExpandTaskForm({
@@ -12,25 +12,18 @@ export default function ExpandTaskForm({
 }: ExpandTaskFormProps) {
   const [keyword, setKeyword] = React.useState("");
   const [preview, setPreview] = React.useState<TodoItem | null>(null);
-  const [error, setError] = React.useState<string | null>(null);
+  const { expandTask, isLoading, error } = useTaskExpansion();
 
-  const handleExpand = () => {
+  const handleExpand = async () => {
     if (!keyword.trim()) {
-      setError("Please enter a keyword");
       setPreview(null);
       return;
     }
 
-    const result = getTaskPreview(keyword);
+    const result = await expandTask(keyword);
 
-    if (result.success) {
-      setPreview(result.todo);
-      setError(null);
-    } else {
-      setPreview(null);
-      setError(
-        `No template found for "${keyword}". Available keywords: user authentication, database setup, api integration`
-      );
+    if (result) {
+      setPreview(result);
     }
   };
 
@@ -39,39 +32,47 @@ export default function ExpandTaskForm({
       onTaskExpanded(preview);
       setKeyword("");
       setPreview(null);
-      setError(null);
     }
   };
 
   const handleCancel = () => {
     setPreview(null);
-    setError(null);
   };
 
   return (
     <div className={styles.container}>
       <div className={styles.header}>
         <SparklesIcon className={styles.icon} />
-        <h2 className={styles.title}>Expand Task from Template</h2>
+        <h2 className={styles.title}>Expand Task with AI</h2>
       </div>
 
       <div className={styles.inputGroup}>
         <div className={styles.inputWrapper}>
           <Input
-            placeholder="Enter keyword (e.g., user authentication, database setup, api integration)..."
+            placeholder="Enter task title (e.g., slump, explode, task)..."
             value={keyword}
             onChange={(e) => setKeyword(e.target.value)}
             onKeyDown={(e) => {
-              if (e.key === "Enter" && !preview) {
+              if (e.key === "Enter" && !preview && !isLoading) {
                 handleExpand();
               }
             }}
-            disabled={!!preview}
+            disabled={!!preview || isLoading}
           />
         </div>
         <div className={styles.buttonGroup}>
-          <Button onClick={handleExpand} disabled={!!preview}>
-            Expand
+          <Button
+            onClick={handleExpand}
+            disabled={!!preview || isLoading || !keyword.trim()}
+          >
+            {isLoading ? (
+              <>
+                <ArrowPathIcon className={styles.icon} />
+                Expanding...
+              </>
+            ) : (
+              "Expand"
+            )}
           </Button>
         </div>
       </div>
