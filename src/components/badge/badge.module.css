@@ -1,0 +1,45 @@
+.root {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  border: 1px solid;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+.root[data-variant="completed"] {
+  background-color: #d1fae5;
+  color: #065f46;
+  border-color: #a7f3d0;
+}
+
+.root[data-variant="completed"]:hover {
+  background-color: #a7f3d0;
+  border-color: #6ee7b7;
+}
+
+.root[data-variant="pending"] {
+  background-color: #fef3c7;
+  color: #92400e;
+  border-color: #fcd34d;
+}
+
+.root[data-variant="pending"]:hover {
+  background-color: #fcd34d;
+  border-color: #fbbf24;
+}
+
+.root[data-variant="default"] {
+  background-color: #f3f4f6;
+  color: #374151;
+  border-color: #e5e7eb;
+}
+
+.root[data-variant="default"]:hover {
+  background-color: #e5e7eb;
+  border-color: #d1d5db;
+}

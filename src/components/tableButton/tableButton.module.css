@@ -1,0 +1,79 @@
+.buttonGroup {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  background-color: transparent;
+  padding: 8px;
+}
+
+.button:hover:not(:disabled) {
+  background-color: #f1f5f9;
+}
+
+.button:active:not(:disabled) {
+  transform: scale(0.95);
+}
+
+.button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.icon {
+  width: 16px;
+  height: 16px;
+}
+
+/* Size variants */
+.size-sm .icon {
+  width: 14px;
+  height: 14px;
+}
+
+.size-md .icon {
+  width: 16px;
+  height: 16px;
+}
+
+.size-lg .icon {
+  width: 20px;
+  height: 20px;
+}
+
+/* Button color variants */
+.viewButton {
+  color: #3b82f6;
+}
+
+.viewButton:hover:not(:disabled) {
+  background-color: #dbeafe;
+  color: #1e40af;
+}
+
+.editButton {
+  color: #f59e0b;
+}
+
+.editButton:hover:not(:disabled) {
+  background-color: #fef3c7;
+  color: #d97706;
+}
+
+.deleteButton {
+  color: #ef4444;
+}
+
+.deleteButton:hover:not(:disabled) {
+  background-color: #fee2e2;
+  color: #dc2626;
+}
