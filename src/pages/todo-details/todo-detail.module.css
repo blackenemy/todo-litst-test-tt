@@ -115,6 +115,7 @@
 .timestamps {
   display: flex;
   flex-direction: row;
+  justify-content: center;
   gap: 12px;
   align-items: center;
 }
@@ -256,6 +257,8 @@
 
 .editMode {
   background-color: white;
+  max-width: 750px;
+  width: 750px;
   border-radius: 8px;
   padding: 32px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
@@ -292,7 +295,7 @@
   border-radius: 6px;
   font-family: inherit;
   font-size: 14px;
-  color: #eaf0f9;
+  color: #000000;
   transition: all 0.2s ease;
 }
 
@@ -447,6 +450,14 @@
   display: flex;
   flex-direction: column;
   gap: 16px;
+}
+
+.backToList {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  margin-bottom: 24px;
+  margin-top: -8px;
 }
 
 @media (max-width: 640px) {

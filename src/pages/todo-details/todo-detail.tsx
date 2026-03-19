@@ -7,6 +7,8 @@ import { Button } from "../../components/button";
 import { useTodoContext, useStatusContext } from "../../context";
 import type { Todo } from "../../api/todo/types";
 import styles from "./todo-detail.module.css";
+import { Input } from "../../components/input";
+import { Textarea } from "../../components/textarea";
 
 interface LocationState {
   todo: Todo;
@@ -148,10 +150,12 @@ export default function TodoDetailPage() {
 
   return (
     <div className={styles.container}>
-      <Button variant="secondary" onClick={() => navigate("/todos")}>
-        <ArrowLeftIcon className={styles.icon} />
-        Back to List
-      </Button>
+      <div className={styles.backToList}>
+        <Button variant="secondary" onClick={() => navigate("/todos")}>
+          <ArrowLeftIcon className={styles.icon} />
+          Back to List
+        </Button>
+      </div>
 
       {mode === "view" ? (
         <div className={styles.viewMode}>
@@ -201,27 +205,36 @@ export default function TodoDetailPage() {
               <h2 className={styles.sectionTitle}>Status History</h2>
               {statusHistory.length > 0 ? (
                 <div className={styles.historyList}>
-                  {statusHistory.map((entry: { id: string; completed: boolean; timestamp: number }, index: number) => (
-                    <div key={index} className={styles.historyItem}>
-                      <div className={styles.historyIcon}>
-                        {entry.completed ? (
-                          <span className={styles.completedIcon}>✓</span>
-                        ) : (
-                          <span className={styles.pendingIcon}>✕</span>
-                        )}
+                  {statusHistory.map(
+                    (
+                      entry: {
+                        id: string;
+                        completed: boolean;
+                        timestamp: number;
+                      },
+                      index: number
+                    ) => (
+                      <div key={index} className={styles.historyItem}>
+                        <div className={styles.historyIcon}>
+                          {entry.completed ? (
+                            <span className={styles.completedIcon}>✓</span>
+                          ) : (
+                            <span className={styles.pendingIcon}>✕</span>
+                          )}
+                        </div>
+                        <div className={styles.historyContent}>
+                          <span className={styles.historyText}>
+                            {entry.completed
+                              ? "Marked as completed"
+                              : "Marked as pending"}
+                          </span>
+                          <span className={styles.historyTime}>
+                            {new Date(entry.timestamp).toLocaleString()}
+                          </span>
+                        </div>
                       </div>
-                      <div className={styles.historyContent}>
-                        <span className={styles.historyText}>
-                          {entry.completed
-                            ? "Marked as completed"
-                            : "Marked as pending"}
-                        </span>
-                        <span className={styles.historyTime}>
-                          {new Date(entry.timestamp).toLocaleString()}
-                        </span>
-                      </div>
-                    </div>
-                  ))}
+                    )
+                  )}
                 </div>
               ) : (
                 <p className={styles.sectionContent}>
@@ -251,33 +264,30 @@ export default function TodoDetailPage() {
             }}
           >
             <div className={styles.formGroup}>
-              <label className={styles.label} htmlFor="title">
-                Title
-              </label>
-              <input
+              <Input
+                label="Title"
                 id="title"
                 name="title"
                 type="text"
-                className={styles.input}
                 placeholder="Enter todo title"
                 value={formData?.title || ""}
                 onChange={handleChange}
                 required
+                isRequired
+                className={styles.input}
               />
             </div>
 
             <div className={styles.formGroup}>
-              <label className={styles.label} htmlFor="description">
-                Description
-              </label>
-              <textarea
+              <Textarea
+                label="Description"
                 id="description"
                 name="description"
-                className={styles.textarea}
                 placeholder="Enter description"
                 value={formData?.description || ""}
                 onChange={handleChange}
                 rows={4}
+                className={styles.textarea}
               />
             </div>
 

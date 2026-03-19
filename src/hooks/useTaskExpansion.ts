@@ -1,6 +1,7 @@
 import { useState, useCallback } from "react";
 import type { TodoItem, Subtask } from "@/context/initialTodos";
 import { getTasks } from "@/api/task";
+import { createTodo } from "@/api/todo";
 
 interface OllamaResponse {
   description: string;
@@ -83,7 +84,7 @@ Return ONLY the JSON object, no markdown, no explanation.`,
 
   const jsonStart = rawResponse.indexOf("{");
   const jsonEnd = rawResponse.lastIndexOf("}");
-  
+
   if (jsonStart === -1 || jsonEnd === -1) {
     throw new Error("No valid JSON found in Ollama response");
   }
@@ -93,7 +94,9 @@ Return ONLY the JSON object, no markdown, no explanation.`,
   try {
     return JSON.parse(jsonString) as OllamaResponse;
   } catch {
-    throw new Error(`Failed to parse Ollama response as JSON: ${jsonString.slice(0, 100)}...`);
+    throw new Error(
+      `Failed to parse Ollama response as JSON: ${jsonString.slice(0, 100)}...`
+    );
   }
 }
 
@@ -107,50 +110,65 @@ export function useTaskExpansion(): UseTaskExpansionReturn {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const expandTask = useCallback(async (keyword: string): Promise<TodoItem | null> => {
-    setIsLoading(true);
-    setError(null);
+  const expandTask = useCallback(
+    async (keyword: string): Promise<TodoItem | null> => {
+      setIsLoading(true);
+      setError(null);
 
-    try {
-      const tasks = await getTasks();
-      const task = tasks.find(t => t.title.toLowerCase() === keyword.toLowerCase());
+      try {
+        const tasks = await getTasks();
+        const task = tasks.find(
+          (t) => t.title.toLowerCase() === keyword.toLowerCase()
+        );
 
-      const contextHint = task ? `This relates to an existing task: "${task.title}"` : "Create a new task from scratch.";
-      const enhancedKeyword = `${contextHint}. User keyword/phrase: "${keyword}"`;
+        const contextHint = task
+          ? `This relates to an existing task: "${task.title}"`
+          : "Create a new task from scratch.";
+        const enhancedKeyword = `${contextHint}. User keyword/phrase: "${keyword}"`;
 
-      const ollamaResponse = await callOllama(enhancedKeyword);
+        const ollamaResponse = await callOllama(enhancedKeyword);
 
-      const subtasks: Subtask[] = ollamaResponse.subtasks.map((subtask) => ({
-        id: generateId(),
-        title: subtask.title,
-        completed: false,
-        actions: subtask.actions.map((actionTitle) => ({
+        const subtasks: Subtask[] = ollamaResponse.subtasks.map((subtask) => ({
           id: generateId(),
-          title: actionTitle,
+          title: subtask.title,
           completed: false,
-        })),
-      }));
+          actions: subtask.actions.map((actionTitle) => ({
+            id: generateId(),
+            title: actionTitle,
+            completed: false,
+          })),
+        }));
 
-      const now = Date.now();
-      const todoItem: TodoItem = {
-        id: 0,
-        title: task ? task.title : keyword,
-        description: ollamaResponse.description,
-        completed: false,
-        subtasks,
-        createdAt: now,
-        updatedAt: now,
-      };
+        const now = Date.now();
+        const todoItem: TodoItem = {
+          id: 0,
+          title: task ? task.title : keyword,
+          description: ollamaResponse.description,
+          completed: false,
+          subtasks,
+          createdAt: now,
+          updatedAt: now,
+        };
 
-      return todoItem;
-    } catch (err) {
-      const message = err instanceof Error ? err.message : "An error occurred";
-      setError(message);
-      return null;
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
+        await createTodo({
+          title: todoItem.title,
+          description: todoItem.description,
+          completed: todoItem.completed,
+          subtasks: todoItem.subtasks,
+        });
+
+        return todoItem;
+      } catch (err) {
+        const message =
+          err instanceof Error ? err.message : "An error occurred";
+        setError(message);
+        return null;
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    []
+  );
 
   return {
     expandTask,

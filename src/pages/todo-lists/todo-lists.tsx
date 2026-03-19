@@ -222,16 +222,22 @@ export default function TodoListsPage() {
                 <Skeleton height={16} width="40%" />
               </div>
             ))
-          ) : filteredTodos.length > 0 ? (
-            filteredTodos.map((todo: Todo) => (
-              <Card
-                key={todo.id}
-                title={todo.title}
-                description={todo.description}
-                completed={todo.completed}
-                onToggle={(checked: boolean) => handleToggle(todo.id, checked)}
-              />
-            ))
+          ) : filteredTodos.filter((todo: Todo) => !todo.completed).length >
+            0 ? (
+            filteredTodos
+              .filter((todo: Todo) => !todo.completed)
+              .map((todo: Todo) => (
+                <Card
+                  key={todo.id}
+                  title={todo.title}
+                  description={todo.description}
+                  completed={todo.completed}
+                  subtasks={todo.subtasks}
+                  onToggle={(checked: boolean) =>
+                    handleToggle(todo.id, checked)
+                  }
+                />
+              ))
           ) : (
             <p className={styles.emptyMessage}>
               No todos found matching your search.
