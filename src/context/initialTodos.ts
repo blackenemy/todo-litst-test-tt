@@ -1,8 +1,26 @@
+export type TodoPriority = "low" | "medium" | "high";
+
+export interface SubAction {
+  id: string;
+  title: string;
+  completed: boolean;
+}
+
+export interface Subtask {
+  id: string;
+  title: string;
+  completed: boolean;
+  actions: SubAction[];
+}
+
 export interface TodoItem {
   id: number;
   title: string;
   description?: string;
   completed: boolean;
+  priority?: TodoPriority;
+  dueDate?: number;
+  subtasks?: Subtask[];
   createdAt: number;
   updatedAt: number;
 }

@@ -1,0 +1,152 @@
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: 500;
+  font-family: inherit;
+  border-radius: 6px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-decoration: none;
+}
+
+.button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Size variants */
+.size-sm {
+  padding: 6px 12px;
+  font-size: 12px;
+}
+
+.size-md {
+  padding: 10px 20px;
+  font-size: 14px;
+}
+
+.size-lg {
+  padding: 12px 24px;
+  font-size: 16px;
+}
+
+/* Primary variant */
+.primary {
+  background-color: #3b82f6;
+  color: #ffffff;
+  border-color: #3b82f6;
+}
+
+.primary:hover:not(:disabled) {
+  background-color: #2563eb;
+  border-color: #2563eb;
+}
+
+.primary:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+/* Secondary variant */
+.secondary {
+  background-color: #ffffff;
+  color: #374151;
+  border-color: #d1d5db;
+}
+
+.secondary:hover:not(:disabled) {
+  background-color: #f9fafb;
+  border-color: #9ca3af;
+}
+
+.secondary:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+/* Text variant */
+.text {
+  background-color: transparent;
+  color: #374151;
+  border-color: transparent;
+  padding: 8px 12px;
+}
+
+.text:hover:not(:disabled) {
+  background-color: #f3f4f6;
+}
+
+.text:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+/* Icon button variant */
+.icon {
+  padding: 8px;
+  background-color: transparent;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
+
+.icon:hover:not(:disabled) {
+  background-color: #f1f5f9;
+}
+
+.icon:active:not(:disabled) {
+  transform: scale(0.95);
+}
+
+/* Icon colors */
+.iconView {
+  color: #3b82f6;
+}
+
+.iconView:hover:not(:disabled) {
+  background-color: #dbeafe;
+  color: #1e40af;
+}
+
+.iconEdit {
+  color: #f59e0b;
+}
+
+.iconEdit:hover:not(:disabled) {
+  background-color: #fef3c7;
+  color: #d97706;
+}
+
+.iconDelete {
+  color: #ef4444;
+}
+
+.iconDelete:hover:not(:disabled) {
+  background-color: #fee2e2;
+  color: #dc2626;
+}
+
+/* Icon wrapper for children */
+.iconWrapper {
+  display: inline-flex;
+  width: 16px;
+  height: 16px;
+}
+
+.size-sm .iconWrapper {
+  width: 14px;
+  height: 14px;
+}
+
+.size-md .iconWrapper {
+  width: 16px;
+  height: 16px;
+}
+
+.size-lg .iconWrapper {
+  width: 20px;
+  height: 20px;
+}

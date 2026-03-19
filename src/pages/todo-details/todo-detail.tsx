@@ -2,9 +2,11 @@ import * as React from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { Input } from "../../components/input";
 import { Textarea } from "../../components/textarea";
+import { Button } from "../../components/button";
 import { ArrowLeftIcon, CheckIcon } from "@heroicons/react/24/outline";
 import * as CheckboxPrimitive from "@radix-ui/react-checkbox";
 import { useStatusContext } from "../../context";
+import type { Subtask } from "../../context/initialTodos";
 import styles from "./todo-detail.module.css";
 
 interface TodoItem {
@@ -12,6 +14,7 @@ interface TodoItem {
   title: string;
   description?: string;
   completed: boolean;
+  subtasks?: Subtask[];
   createdAt: number;
   updatedAt: number;
 }
@@ -105,19 +108,53 @@ export default function TodoDetailPage() {
     }
   };
 
+  const handleSubtaskToggle = (subtaskId: string, completed: boolean) => {
+    if (todo) {
+      setTodo((prev) =>
+        prev
+          ? {
+              ...prev,
+              subtasks: prev.subtasks?.map((st) =>
+                st.id === subtaskId ? { ...st, completed } : st
+              ),
+            }
+          : null
+      );
+    }
+  };
+
+  const handleActionToggle = (subtaskId: string, actionId: string, completed: boolean) => {
+    if (todo) {
+      setTodo((prev) =>
+        prev
+          ? {
+              ...prev,
+              subtasks: prev.subtasks?.map((st) =>
+                st.id === subtaskId
+                  ? {
+                      ...st,
+                      actions: st.actions?.map((action) =>
+                        action.id === actionId ? { ...action, completed } : action
+                      ),
+                    }
+                  : st
+              ),
+            }
+          : null
+      );
+    }
+  };
+
   // Get status history for this todo
   const statusHistory = todo ? getHistoryForTodo(String(todo.id)) : [];
 
   if (!todo) {
     return (
       <div className={styles.container}>
-        <button
-          className={styles.backButton}
-          onClick={() => navigate("/todos")}
-        >
+        <Button variant="secondary" onClick={() => navigate("/todos")}>
           <ArrowLeftIcon className={styles.icon} />
           Back
-        </button>
+        </Button>
         <div className={styles.emptyState}>
           <p>Todo not found</p>
         </div>
@@ -127,10 +164,10 @@ export default function TodoDetailPage() {
 
   return (
     <div className={styles.container}>
-      <button className={styles.backButton} onClick={() => navigate("/todos")}>
+      <Button variant="secondary" onClick={() => navigate("/todos")}>
         <ArrowLeftIcon className={styles.icon} />
         Back to List
-      </button>
+      </Button>
 
       {mode === "view" ? (
         <div className={styles.viewMode}>
@@ -169,6 +206,48 @@ export default function TodoDetailPage() {
               </div>
             </div>
 
+            {todo.subtasks && todo.subtasks.length > 0 && (
+              <div className={styles.section}>
+                <h2 className={styles.sectionTitle}>Subtasks</h2>
+                <div className={styles.subtasksList}>
+                  {todo.subtasks.map((subtask) => (
+                    <div key={subtask.id} className={styles.subtask}>
+                      <div className={styles.subtaskHeader}>
+                        <CheckboxPrimitive.Root
+                          className={styles.subtaskCheckbox}
+                          checked={subtask.completed}
+                          onCheckedChange={(checked) =>
+                            handleSubtaskToggle(subtask.id, checked as boolean)
+                          }
+                        >
+                          <CheckboxPrimitive.Indicator />
+                        </CheckboxPrimitive.Root>
+                        <span className={styles.subtaskTitle}>{subtask.title}</span>
+                      </div>
+                      {subtask.actions && subtask.actions.length > 0 && (
+                        <div className={styles.actionsList}>
+                          {subtask.actions.map((action) => (
+                            <div key={action.id} className={styles.action}>
+                              <CheckboxPrimitive.Root
+                                className={styles.actionCheckbox}
+                                checked={action.completed}
+                                onCheckedChange={(checked) =>
+                                  handleActionToggle(subtask.id, action.id, checked as boolean)
+                                }
+                              >
+                                <CheckboxPrimitive.Indicator />
+                              </CheckboxPrimitive.Root>
+                              <span className={styles.actionTitle}>{action.title}</span>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
             <div className={styles.section}>
               <h2 className={styles.sectionTitle}>Status History</h2>
               {statusHistory.length > 0 ? (
@@ -204,15 +283,12 @@ export default function TodoDetailPage() {
           </div>
 
           <div className={styles.actions}>
-            <button className={styles.buttonPrimary} onClick={handleEdit}>
+            <Button variant="primary" onClick={handleEdit}>
               Edit
-            </button>
-            <button
-              className={styles.buttonSecondary}
-              onClick={() => navigate("/todos")}
-            >
+            </Button>
+            <Button variant="secondary" onClick={() => navigate("/todos")}>
               Close
-            </button>
+            </Button>
           </div>
         </div>
       ) : (
@@ -262,16 +338,12 @@ export default function TodoDetailPage() {
             </div>
 
             <div className={styles.actions}>
-              <button className={styles.buttonPrimary} type="submit">
+              <Button variant="primary" type="submit">
                 Save Changes
-              </button>
-              <button
-                className={styles.buttonSecondary}
-                type="button"
-                onClick={handleCancel}
-              >
+              </Button>
+              <Button variant="secondary" type="button" onClick={handleCancel}>
                 Cancel
-              </button>
+              </Button>
             </div>
           </form>
         </div>
