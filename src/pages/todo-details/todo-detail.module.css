@@ -439,6 +439,16 @@
   line-height: 1.4;
 }
 
+.skeletonContainer {
+  background-color: white;
+  border-radius: 8px;
+  padding: 32px;
+  margin-top: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
 @media (max-width: 640px) {
   .container {
     padding: 16px;
