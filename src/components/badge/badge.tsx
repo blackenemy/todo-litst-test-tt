@@ -1,14 +1,13 @@
-import * as React from "react";
 import type { BadgeProps } from "./types";
 import { getBadgeLabel } from "./helpers";
 import styles from "./badge.module.css";
 
-export const Badge: React.FC<BadgeProps> = ({
+function Badge({
   variant = "default",
   label,
   className,
   ...rest
-}) => {
+}: BadgeProps) {
   const displayLabel = label || getBadgeLabel(variant === "completed");
 
   return (
@@ -25,6 +24,6 @@ export const Badge: React.FC<BadgeProps> = ({
       {displayLabel}
     </span>
   );
-};
+}
 
 export default Badge;

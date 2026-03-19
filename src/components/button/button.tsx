@@ -1,8 +1,7 @@
-import * as React from "react";
 import type { ButtonProps } from "./types";
 import styles from "./button.module.css";
 
-export const Button: React.FC<ButtonProps> = ({
+function Button({
   variant = "primary",
   size = "md",
   isLoading = false,
@@ -11,7 +10,7 @@ export const Button: React.FC<ButtonProps> = ({
   iconColor,
   children,
   ...props
-}) => {
+}: ButtonProps) {
   return (
     <button
       className={`${styles.button} ${styles[variant]} ${styles[`size-${size}`]} ${
@@ -27,4 +26,6 @@ export const Button: React.FC<ButtonProps> = ({
       )}
     </button>
   );
-};
+}
+
+export default Button;

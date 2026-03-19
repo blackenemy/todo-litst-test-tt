@@ -7,9 +7,7 @@ import { useTaskExpansion } from "@/hooks";
 import type { TodoItem } from "@/context/initialTodos";
 import styles from "./expand-task-form.module.css";
 
-export default function ExpandTaskForm({
-  onTaskExpanded,
-}: ExpandTaskFormProps) {
+function ExpandTaskForm({ onTaskExpanded }: ExpandTaskFormProps) {
   const [keyword, setKeyword] = React.useState("");
   const [preview, setPreview] = React.useState<TodoItem | null>(null);
   const { expandTask, isLoading, error } = useTaskExpansion();
@@ -121,3 +119,5 @@ export default function ExpandTaskForm({
     </div>
   );
 }
+
+export default ExpandTaskForm;

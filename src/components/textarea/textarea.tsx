@@ -1,8 +1,7 @@
-import * as React from 'react';
 import type { TextareaProps } from './types';
 import styles from './textarea.module.css';
 
-export const Textarea: React.FC<TextareaProps> = ({
+function Textarea({
   label,
   error,
   helperText,
@@ -10,7 +9,7 @@ export const Textarea: React.FC<TextareaProps> = ({
   className,
   disabled,
   ...props
-}) => {
+}: TextareaProps) {
   return (
     <div className={styles.textareaWrapper}>
       {label && (
@@ -28,4 +27,6 @@ export const Textarea: React.FC<TextareaProps> = ({
       {helperText && !error && <p className={styles.helperText}>{helperText}</p>}
     </div>
   );
-};
+}
+
+export default Textarea;
