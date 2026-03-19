@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useReducer } from "react";
+import { createContext, useContext, useReducer } from "react";
 import type { ReactNode } from "react";
 
 export interface StatusChangeData {
@@ -75,9 +75,7 @@ const statusReducer = (state: StatusState, action: StatusAction): StatusState =>
 
 const StatusContext = createContext<StatusContextType | undefined>(undefined);
 
-export const StatusProvider: React.FC<{ children: ReactNode }> = ({
-  children,
-}) => {
+export function StatusProvider({ children }: { children: ReactNode }) {
   const [state, dispatch] = useReducer(statusReducer, initialState);
 
   const updateStatus = (id: string, completed: boolean) => {
@@ -111,9 +109,9 @@ export const StatusProvider: React.FC<{ children: ReactNode }> = ({
   return (
     <StatusContext.Provider value={value}>{children}</StatusContext.Provider>
   );
-};
+}
 
-export const useStatusContext = (): StatusContextType => {
+export function useStatusContext(): StatusContextType {
   const context = useContext(StatusContext);
   if (!context) {
     throw new Error(
@@ -121,4 +119,4 @@ export const useStatusContext = (): StatusContextType => {
     );
   }
   return context;
-};
+}

@@ -1,11 +1,11 @@
-import * as React from "react";
+import { useState } from "react";
 import * as CheckboxPrimitive from "@radix-ui/react-checkbox";
 import { CheckIcon } from "@radix-ui/react-icons";
 import { ChevronDownIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
 import type { CardProps } from "./types";
 import styles from "./card.module.css";
 
-export const Card: React.FC<CardProps> = ({
+function Card({
   title,
   description,
   completed = false,
@@ -13,9 +13,9 @@ export const Card: React.FC<CardProps> = ({
   onToggle,
   onSubtaskToggle,
   onActionToggle,
-}) => {
-  const [isChecked, setIsChecked] = React.useState(completed);
-  const [isSubtasksExpanded, setIsSubtasksExpanded] = React.useState(false);
+}: CardProps) {
+  const [isChecked, setIsChecked] = useState(completed);
+  const [isSubtasksExpanded, setIsSubtasksExpanded] = useState(false);
 
   const handleCheckedChange = (checked: boolean) => {
     setIsChecked(checked);
@@ -107,4 +107,6 @@ export const Card: React.FC<CardProps> = ({
       )}
     </div>
   );
-};
+}
+
+export default Card;

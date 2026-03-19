@@ -1,2 +1,2 @@
-export { Textarea } from './textarea';
+export { default as Textarea } from './textarea';
 export type { TextareaProps } from './types';

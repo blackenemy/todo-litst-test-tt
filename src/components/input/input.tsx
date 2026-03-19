@@ -1,8 +1,7 @@
-import * as React from 'react';
 import type { InputProps } from './types';
 import styles from './input.module.css';
 
-export const Input: React.FC<InputProps> = ({
+function Input({
   label,
   error,
   helperText,
@@ -10,7 +9,7 @@ export const Input: React.FC<InputProps> = ({
   className,
   disabled,
   ...props
-}) => {
+}: InputProps) {
   return (
     <div className={styles.inputWrapper}>
       {label && (
@@ -28,4 +27,6 @@ export const Input: React.FC<InputProps> = ({
       {helperText && !error && <p className={styles.helperText}>{helperText}</p>}
     </div>
   );
-};
+}
+
+export default Input;

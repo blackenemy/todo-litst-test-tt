@@ -1,9 +1,9 @@
-import * as React from 'react';
+import type { ReactNode } from 'react';
 import type { TableProps, ColumnPosition } from './types';
 import { TableButton } from '../tableButton';
 import styles from './table.module.css';
 
-export const Table: React.FC<TableProps> = ({
+function Table({
   columns,
   data,
   onView,
@@ -11,7 +11,7 @@ export const Table: React.FC<TableProps> = ({
   onDelete,
   isLoading = false,
   emptyMessage = 'No data available',
-}) => {
+}: TableProps) {
   if (!data || data.length === 0) {
     return (
       <div className={styles.emptyState}>
@@ -77,13 +77,13 @@ export const Table: React.FC<TableProps> = ({
         <tbody>
           {data.map((row: Record<string, unknown>, index: number) => (
             <tr key={index} className={styles.tr}>
-              {orderedColumns.map((column: { key: string; label: string; position?: ColumnPosition; render?: (value: unknown, row: Record<string, unknown>) => React.ReactNode }) => {
+              {orderedColumns.map((column: { key: string; label: string; position?: ColumnPosition; render?: (value: unknown, row: Record<string, unknown>) => ReactNode }) => {
                 const positionClass = column.position ? styles[column.position] : styles.middle;
                 return (
                   <td key={column.key} className={`${styles.td} ${positionClass}`}>
                     {column.render
                       ? column.render(row[column.key], row)
-                      : (row[column.key] as React.ReactNode)}
+                      : (row[column.key] as ReactNode)}
                   </td>
                 );
               })}
@@ -102,4 +102,6 @@ export const Table: React.FC<TableProps> = ({
       </table>
     </div>
   );
-};
+}
+
+export default Table;

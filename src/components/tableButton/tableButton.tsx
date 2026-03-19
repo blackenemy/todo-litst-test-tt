@@ -1,4 +1,3 @@
-import * as React from 'react';
 import {
   EyeIcon,
   PencilIcon,
@@ -8,13 +7,13 @@ import type { TableButtonProps } from './types';
 import { Button } from '../button';
 import styles from './tableButton.module.css';
 
-export const TableButton: React.FC<TableButtonProps> = ({
+function TableButton({
   onView,
   onEdit,
   onDelete,
   isLoading = false,
   size = 'md',
-}) => {
+}: TableButtonProps) {
   return (
     <div className={`${styles.buttonGroup} ${styles[`size-${size}`]}`}>
       <Button
@@ -52,4 +51,6 @@ export const TableButton: React.FC<TableButtonProps> = ({
       </Button>
     </div>
   );
-};
+}
+
+export default TableButton;
