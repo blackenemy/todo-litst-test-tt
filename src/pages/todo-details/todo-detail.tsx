@@ -1,32 +1,20 @@
 import * as React from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
-import { Input } from "../../components/input";
-import { Textarea } from "../../components/textarea";
+import { ArrowLeftIcon } from "@heroicons/react/24/outline";
+import Skeleton from "react-loading-skeleton";
+import "react-loading-skeleton/dist/skeleton.css";
 import { Button } from "../../components/button";
-import { ArrowLeftIcon, CheckIcon } from "@heroicons/react/24/outline";
-import * as CheckboxPrimitive from "@radix-ui/react-checkbox";
-import { useStatusContext } from "../../context";
-import type { Subtask } from "../../context/initialTodos";
+import { useTodoContext, useStatusContext } from "../../context";
+import type { Todo } from "../../api/todo/types";
 import styles from "./todo-detail.module.css";
 
-interface TodoItem {
-  id: number;
-  title: string;
-  description?: string;
-  completed: boolean;
-  subtasks?: Subtask[];
-  createdAt: number;
-  updatedAt: number;
-}
-
 interface LocationState {
-  todo: TodoItem;
+  todo: Todo;
   mode?: "view" | "edit";
 }
 
-// Helper function to format timestamp to readable date
-const formatDate = (timestamp: number): string => {
-  const date = new Date(timestamp);
+const formatDate = (dateString: string): string => {
+  const date = new Date(dateString);
   return date.toLocaleString("en-US", {
     year: "numeric",
     month: "short",
@@ -41,19 +29,30 @@ export default function TodoDetailPage() {
   const navigate = useNavigate();
   const location = useLocation();
   const state = location.state as LocationState | null;
-  const { getHistoryForTodo, updateStatus } = useStatusContext();
+  const { todos, isLoading, updateTodo, updateStatus } = useTodoContext();
+  const statusContext = useStatusContext();
 
-  const [todo, setTodo] = React.useState<TodoItem | null>(state?.todo || null);
+  const [todo, setTodo] = React.useState<Todo | null>(state?.todo || null);
   const [mode, setMode] = React.useState<"view" | "edit">(
     state?.mode || "view"
   );
-  const [formData, setFormData] = React.useState<TodoItem | null>(todo);
+  const [formData, setFormData] = React.useState<Todo | null>(todo);
+  const [isSaving, setIsSaving] = React.useState(false);
 
   React.useEffect(() => {
     if (!todo && id) {
-      console.log(`Would fetch todo with id: ${id}`);
+      const foundTodo = todos.find((t: Todo) => t.id === id);
+      if (foundTodo) {
+        setTodo(foundTodo);
+      }
     }
-  }, [id, todo]);
+  }, [id, todo, todos]);
+
+  React.useEffect(() => {
+    if (todo) {
+      setFormData(todo);
+    }
+  }, [todo]);
 
   const handleEdit = () => {
     setMode("edit");
@@ -65,14 +64,20 @@ export default function TodoDetailPage() {
     setFormData(null);
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (formData) {
-      const updatedTodo = {
-        ...formData,
-        updatedAt: Date.now(),
-      };
-      setTodo(updatedTodo);
-      setMode("view");
+      setIsSaving(true);
+      const updatedTodo = await updateTodo(formData.id, {
+        title: formData.title,
+        description: formData.description,
+        completed: formData.completed,
+      });
+      setIsSaving(false);
+
+      if (updatedTodo) {
+        setTodo(updatedTodo);
+        setMode("view");
+      }
     }
   };
 
@@ -103,50 +108,29 @@ export default function TodoDetailPage() {
             }
           : null
       );
-      // Track status change in context
-      updateStatus(String(todo?.id), checked);
+      updateStatus(todo?.id || "", checked);
     }
   };
 
-  const handleSubtaskToggle = (subtaskId: string, completed: boolean) => {
-    if (todo) {
-      setTodo((prev) =>
-        prev
-          ? {
-              ...prev,
-              subtasks: prev.subtasks?.map((st) =>
-                st.id === subtaskId ? { ...st, completed } : st
-              ),
-            }
-          : null
-      );
-    }
-  };
+  const statusHistory = todo ? statusContext.getHistoryForTodo(todo.id) : [];
 
-  const handleActionToggle = (subtaskId: string, actionId: string, completed: boolean) => {
-    if (todo) {
-      setTodo((prev) =>
-        prev
-          ? {
-              ...prev,
-              subtasks: prev.subtasks?.map((st) =>
-                st.id === subtaskId
-                  ? {
-                      ...st,
-                      actions: st.actions?.map((action) =>
-                        action.id === actionId ? { ...action, completed } : action
-                      ),
-                    }
-                  : st
-              ),
-            }
-          : null
-      );
-    }
-  };
-
-  // Get status history for this todo
-  const statusHistory = todo ? getHistoryForTodo(String(todo.id)) : [];
+  if (isLoading && !todo) {
+    return (
+      <div className={styles.container}>
+        <Button variant="secondary" onClick={() => navigate("/todos")}>
+          <ArrowLeftIcon className={styles.icon} />
+          Back
+        </Button>
+        <div className={styles.skeletonContainer}>
+          <Skeleton height={40} width={300} />
+          <Skeleton height={24} width={150} />
+          <Skeleton height={20} width={200} />
+          <Skeleton height={20} width={180} />
+          <Skeleton height={20} width={220} />
+        </div>
+      </div>
+    );
+  }
 
   if (!todo) {
     return (
@@ -189,6 +173,13 @@ export default function TodoDetailPage() {
             </div>
 
             <div className={styles.section}>
+              <h2 className={styles.sectionTitle}>Status</h2>
+              <p className={styles.sectionContent}>
+                {todo.completed ? "Completed" : "Pending"}
+              </p>
+            </div>
+
+            <div className={styles.section}>
               <h2 className={styles.sectionTitle}>Timestamps</h2>
               <div className={styles.timestamps}>
                 <div className={styles.timestampItem}>
@@ -206,57 +197,15 @@ export default function TodoDetailPage() {
               </div>
             </div>
 
-            {todo.subtasks && todo.subtasks.length > 0 && (
-              <div className={styles.section}>
-                <h2 className={styles.sectionTitle}>Subtasks</h2>
-                <div className={styles.subtasksList}>
-                  {todo.subtasks.map((subtask) => (
-                    <div key={subtask.id} className={styles.subtask}>
-                      <div className={styles.subtaskHeader}>
-                        <CheckboxPrimitive.Root
-                          className={styles.subtaskCheckbox}
-                          checked={subtask.completed}
-                          onCheckedChange={(checked) =>
-                            handleSubtaskToggle(subtask.id, checked as boolean)
-                          }
-                        >
-                          <CheckboxPrimitive.Indicator />
-                        </CheckboxPrimitive.Root>
-                        <span className={styles.subtaskTitle}>{subtask.title}</span>
-                      </div>
-                      {subtask.actions && subtask.actions.length > 0 && (
-                        <div className={styles.actionsList}>
-                          {subtask.actions.map((action) => (
-                            <div key={action.id} className={styles.action}>
-                              <CheckboxPrimitive.Root
-                                className={styles.actionCheckbox}
-                                checked={action.completed}
-                                onCheckedChange={(checked) =>
-                                  handleActionToggle(subtask.id, action.id, checked as boolean)
-                                }
-                              >
-                                <CheckboxPrimitive.Indicator />
-                              </CheckboxPrimitive.Root>
-                              <span className={styles.actionTitle}>{action.title}</span>
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
             <div className={styles.section}>
               <h2 className={styles.sectionTitle}>Status History</h2>
               {statusHistory.length > 0 ? (
                 <div className={styles.historyList}>
-                  {statusHistory.map((entry, index) => (
+                  {statusHistory.map((entry: { id: string; completed: boolean; timestamp: number }, index: number) => (
                     <div key={index} className={styles.historyItem}>
                       <div className={styles.historyIcon}>
                         {entry.completed ? (
-                          <CheckIcon className={styles.completedIcon} />
+                          <span className={styles.completedIcon}>✓</span>
                         ) : (
                           <span className={styles.pendingIcon}>✕</span>
                         )}
@@ -268,7 +217,7 @@ export default function TodoDetailPage() {
                             : "Marked as pending"}
                         </span>
                         <span className={styles.historyTime}>
-                          {formatDate(entry.timestamp)}
+                          {new Date(entry.timestamp).toLocaleString()}
                         </span>
                       </div>
                     </div>
@@ -301,45 +250,54 @@ export default function TodoDetailPage() {
               handleSave();
             }}
           >
-            <Input
-              id="title"
-              name="title"
-              type="text"
-              placeholder="Enter todo title"
-              label="Title"
-              value={formData?.title || ""}
-              onChange={handleChange}
-              isRequired
-            />
+            <div className={styles.formGroup}>
+              <label className={styles.label} htmlFor="title">
+                Title
+              </label>
+              <input
+                id="title"
+                name="title"
+                type="text"
+                className={styles.input}
+                placeholder="Enter todo title"
+                value={formData?.title || ""}
+                onChange={handleChange}
+                required
+              />
+            </div>
 
-            <Textarea
-              id="description"
-              name="description"
-              label="Description"
-              placeholder="Enter description"
-              value={formData?.description || ""}
-              onChange={handleChange}
-              rows={4}
-            />
+            <div className={styles.formGroup}>
+              <label className={styles.label} htmlFor="description">
+                Description
+              </label>
+              <textarea
+                id="description"
+                name="description"
+                className={styles.textarea}
+                placeholder="Enter description"
+                value={formData?.description || ""}
+                onChange={handleChange}
+                rows={4}
+              />
+            </div>
 
             <div className={styles.formGroup}>
               <label className={styles.checkboxLabel} htmlFor="completed">
-                <CheckboxPrimitive.Root
-                  className={styles.checkbox}
+                <input
+                  type="checkbox"
                   id="completed"
                   name="completed"
+                  className={styles.checkbox}
                   checked={formData?.completed || false}
-                  onCheckedChange={handleStatusChange}
-                >
-                  <CheckboxPrimitive.Indicator />
-                </CheckboxPrimitive.Root>
+                  onChange={(e) => handleStatusChange(e.target.checked)}
+                />
                 <span>Mark as completed</span>
               </label>
             </div>
 
             <div className={styles.actions}>
-              <Button variant="primary" type="submit">
-                Save Changes
+              <Button variant="primary" type="submit" disabled={isSaving}>
+                {isSaving ? "Saving..." : "Save Changes"}
               </Button>
               <Button variant="secondary" type="button" onClick={handleCancel}>
                 Cancel

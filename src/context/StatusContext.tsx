@@ -73,7 +73,7 @@ const statusReducer = (state: StatusState, action: StatusAction): StatusState =>
   }
 };
 
-const StatusContext = createContext<StatusContextType | undefined>(undefined);
+export const StatusContext = createContext<StatusContextType | undefined>(undefined);
 
 export function StatusProvider({ children }: { children: ReactNode }) {
   const [state, dispatch] = useReducer(statusReducer, initialState);
