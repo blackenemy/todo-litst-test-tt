@@ -1,6 +1,7 @@
 import type { Subtask } from "../../context/initialTodos";
 
 export interface CardProps {
+  isLoading?: boolean;
   title: string;
   description?: string;
   completed?: boolean;
