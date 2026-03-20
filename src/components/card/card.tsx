@@ -2,10 +2,13 @@ import { useState } from "react";
 import * as CheckboxPrimitive from "@radix-ui/react-checkbox";
 import { CheckIcon } from "@radix-ui/react-icons";
 import { ChevronDownIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
+import Skeleton from "react-loading-skeleton";
+import "react-loading-skeleton/dist/skeleton.css";
 import type { CardProps } from "./types";
 import styles from "./card.module.css";
 
 function Card({
+  isLoading,
   title,
   description,
   completed = false,
@@ -24,6 +27,19 @@ function Card({
   const handleSubtaskToggle = (subtaskId: string, completed: boolean) => {
     onSubtaskToggle?.(subtaskId, completed);
   };
+
+  if (isLoading) {
+    return (
+      <div className={styles.card}>
+        <div className={styles.cardHeader}>
+          <Skeleton height={24} width="60%" />
+          <Skeleton circle width={20} height={20} />
+        </div>
+        <Skeleton height={16} width="90%" />
+        <Skeleton height={16} width="40%" />
+      </div>
+    );
+  }
 
   return (
     <div className={styles.card}>

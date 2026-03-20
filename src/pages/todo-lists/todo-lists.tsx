@@ -1,5 +1,4 @@
 import * as React from "react";
-import Skeleton from "react-loading-skeleton";
 import { useNavigate } from "react-router-dom";
 
 import { toast } from "sonner";
@@ -303,13 +302,9 @@ export default function TodoListsPage() {
       <div className={styles.section}>
         <h2 className={styles.sectionTitle}>Card View</h2>
         <div className={styles.cardViewContainer}>
-          {isLoading && todos.length === 0 ? (
-            Array.from({ length: 3 }).map((_, index) => (
-              <div key={index} className={styles.skeletonCard}>
-                <Skeleton height={24} width="60%" />
-                <Skeleton height={16} width="90%" />
-                <Skeleton height={16} width="40%" />
-              </div>
+          {isLoading ? (
+            Array.from({ length: 3 }).map((_, i) => (
+              <Card key={i} isLoading={true} title="" />
             ))
           ) : filteredTodos.filter((todo: Todo) => !todo.completed).length >
             0 ? (
@@ -343,28 +338,23 @@ export default function TodoListsPage() {
 
       <div className={styles.section}>
         <h2 className={styles.sectionTitle}>Table View</h2>
-        {isLoading && todos.length === 0 ? (
-          <div className={styles.skeletonTable}>
-            <Skeleton height={40} count={5} />
-          </div>
-        ) : (
-          <Table
-            columns={columns}
-            data={paginatedTodos as unknown as Record<string, unknown>[]}
-            onView={handleView}
-            onEdit={handleEdit}
-            onDelete={handleDelete}
-            emptyMessage="No todos found. Try adjusting your search."
-            toolbar={
-              <StatusOption value={statusFilter} onChange={setStatusFilter} />
-            }
-            pagination={{
-              currentPage,
-              totalPages,
-              onPageChange: setCurrentPage,
-            }}
-          />
-        )}
+        <Table
+          columns={columns}
+          data={paginatedTodos as unknown as Record<string, unknown>[]}
+          isLoading={isLoading}
+          onView={handleView}
+          onEdit={handleEdit}
+          onDelete={handleDelete}
+          emptyMessage="No todos found. Try adjusting your search."
+          toolbar={
+            <StatusOption value={statusFilter} onChange={setStatusFilter} />
+          }
+          pagination={{
+            currentPage,
+            totalPages,
+            onPageChange: setCurrentPage,
+          }}
+        />
       </div>
       <Dialog
         open={deleteTarget !== null}

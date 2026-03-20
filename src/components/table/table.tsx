@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import Skeleton from 'react-loading-skeleton';
 import type { TableProps, ColumnPosition } from './types';
 import { TableButton } from '../tableButton';
 import { Pagination } from '../pagination';
@@ -15,6 +16,36 @@ function Table({
   toolbar,
   pagination,
 }: TableProps) {
+  if (isLoading) {
+    return (
+      <div className={styles.tableWrapper}>
+        {toolbar && <div className={styles.toolbar}>{toolbar}</div>}
+        <table className={styles.table}>
+          <thead>
+            <tr>
+              {columns.map(col => <th key={col.key} className={styles.th}>{col.label}</th>)}
+              <th className={styles.th}>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {Array.from({ length: 5 }).map((_, i) => (
+              <tr key={i} className={styles.tr}>
+                {columns.map(col => (
+                  <td key={col.key} className={styles.td}>
+                    <Skeleton height={20} />
+                  </td>
+                ))}
+                <td className={styles.tdActions}>
+                  <Skeleton height={20} width={80} />
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    );
+  }
+
   if (!data || data.length === 0) {
     return (
       <div className={styles.emptyState}>
