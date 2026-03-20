@@ -13,6 +13,7 @@ export interface StatusChangeData {
 export interface TodoContextType {
   todos: Todo[];
   isLoading: boolean;
+  isMutating: boolean;
   error: string | null;
   statusHistory: StatusChangeData[];
   currentStatus: Map<string, boolean>;
@@ -185,7 +186,8 @@ export function TodoProvider({ children }: { children: ReactNode }) {
 
   const value: TodoContextType = {
     todos: state.todos.length > 0 ? state.todos : apiTodos,
-    isLoading: apiLoading || createLoading || updateLoading || deleteLoading,
+    isLoading: apiLoading,
+    isMutating: createLoading || updateLoading || deleteLoading,
     error: apiError,
     statusHistory: state.statusHistory,
     currentStatus: state.currentStatus,

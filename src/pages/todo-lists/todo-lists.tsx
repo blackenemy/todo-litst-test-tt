@@ -248,7 +248,7 @@ export default function TodoListsPage() {
           <Button
             onClick={() => setIsCreateFormVisible(!isCreateFormVisible)}
             className={styles.createButton}
-            disabled={isLoading}
+            disabled={isLoading && todos.length === 0}
           >
             <PlusIcon className={styles.buttonIcon} />
             Create Todo
