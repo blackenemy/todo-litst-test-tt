@@ -1,0 +1,115 @@
+@keyframes overlayShow {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes overlayHide {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+@keyframes contentShow {
+  from { opacity: 0; transform: translate(-50%, -48%) scale(0.96); }
+  to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+}
+
+@keyframes contentHide {
+  from { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+  to { opacity: 0; transform: translate(-50%, -48%) scale(0.96); }
+}
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 50;
+}
+
+.overlay[data-state='open'] {
+  animation: overlayShow 150ms ease;
+}
+
+.overlay[data-state='closed'] {
+  animation: overlayHide 150ms ease;
+}
+
+.content {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 90vw;
+  max-width: 500px;
+  background: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+  z-index: 51;
+  overflow: hidden;
+}
+
+.content[data-state='open'] {
+  animation: contentShow 150ms ease;
+}
+
+.content[data-state='closed'] {
+  animation: contentHide 150ms ease;
+}
+
+.header {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #1e293b;
+  margin: 0;
+}
+
+.description {
+  color: #64748b;
+  font-size: 0.875rem;
+  padding: 12px 20px 0;
+  margin: 0;
+}
+
+.body {
+  padding: 16px 20px;
+}
+
+.footer {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 12px 20px;
+  border-top: 1px solid #e2e8f0;
+}
+
+.closeButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  border-radius: 4px;
+  cursor: pointer;
+  color: #64748b;
+  padding: 4px;
+  transition: background-color 150ms ease, color 150ms ease;
+}
+
+.closeButton:hover {
+  background-color: #f1f5f9;
+  color: #1e293b;
+}
+
+.closeIcon {
+  width: 20px;
+  height: 20px;
+}

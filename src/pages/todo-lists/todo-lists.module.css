@@ -1,0 +1,235 @@
+.container {
+  padding: 24px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.header {
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+
+.heading {
+  margin: 0 0 8px 0;
+  font-size: 28px;
+  font-weight: bold;
+  color: #1e293b;
+}
+
+.subtitle {
+  margin: 0;
+  color: #64748b;
+  font-size: 14px;
+}
+
+.createButton {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.buttonIcon {
+  width: 20px;
+  height: 20px;
+}
+
+.searchWrapper {
+  margin-bottom: 24px;
+}
+
+.searchBar {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  align-items: flex-start;
+  margin-bottom: 16px;
+}
+
+.searchInputWrapper {
+  flex: 1;
+  max-width: 400px;
+}
+
+.createForm {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 24px;
+  background-color: #f8fafc;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+}
+
+.descriptionInput textarea {
+  min-height: 100px;
+  resize: vertical;
+}
+
+.priorityWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.priorityLabel {
+  font-size: 14px;
+  font-weight: 500;
+  color: #334155;
+}
+
+.priorityOptions {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.priorityOption {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+}
+
+.priorityOption input[type="radio"] {
+  cursor: pointer;
+}
+
+.priorityText {
+  font-size: 14px;
+  color: #475569;
+}
+
+.formActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.section {
+  margin-bottom: 32px;
+}
+
+.sectionTitle {
+  margin: 0 0 16px 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #334155;
+}
+
+.cardViewContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.emptyMessage {
+  color: #94a3b8;
+  text-align: center;
+  padding: 24px;
+  margin: 0;
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 16px;
+  }
+
+  .header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .createButton {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .heading {
+    font-size: 24px;
+  }
+
+  .searchWrapper {
+    max-width: 100%;
+  }
+
+  .searchBar {
+    flex-direction: column;
+  }
+
+  .searchInputWrapper {
+    max-width: 100%;
+  }
+
+  .section {
+    margin-bottom: 24px;
+  }
+
+  .sectionTitle {
+    font-size: 16px;
+  }
+
+  .formActions {
+    flex-direction: column;
+  }
+
+  .formActions button {
+    width: 100%;
+  }
+
+  .priorityOptions {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .createForm {
+    padding: 16px;
+  }
+}
+
+.errorState {
+  text-align: center;
+  padding: 48px;
+  color: #ef4444;
+}
+
+.errorState p {
+  margin-bottom: 16px;
+}
+
+.skeletonCard {
+  padding: 16px;
+  background-color: #f8fafc;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.skeletonTable {
+  padding: 16px;
+  background-color: #f8fafc;
+  border-radius: 8px;
+}
+
+@media (max-width: 640px) {
+  .container {
+    padding: 12px;
+  }
+
+  .heading {
+    font-size: 20px;
+  }
+
+  .subtitle {
+    font-size: 12px;
+  }
+
+  .cardViewContainer {
+    gap: 8px;
+  }
+}

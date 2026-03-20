@@ -1,0 +1,281 @@
+import * as React from "react";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
+import Skeleton from "react-loading-skeleton";
+
+import "react-loading-skeleton/dist/skeleton.css";
+import styles from "./todo-detail.module.css";
+
+import { useTodoContext } from "../../context";
+
+import { toast } from "sonner";
+import { Button } from "../../components/button";
+import { ArrowLeftIcon } from "@heroicons/react/24/outline";
+import { Input } from "../../components/input";
+import { Textarea } from "../../components/textarea";
+import { Checkbox } from "../../components/checkbox";
+import { Badge } from "../../components/badge";
+
+import type { Todo } from "../../api/todo/types";
+
+interface LocationState {
+  todo: Todo;
+  mode?: "view" | "edit";
+}
+
+const formatDate = (dateString: string): string => {
+  const date = new Date(dateString);
+  return date.toLocaleString("en-US", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+};
+
+export default function TodoDetailPage() {
+  const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const state = location.state as LocationState | null;
+  const { todos, isLoading, updateTodo, updateStatus } = useTodoContext();
+
+  const [todo, setTodo] = React.useState<Todo | null>(state?.todo || null);
+  const [mode, setMode] = React.useState<"view" | "edit">(
+    state?.mode || "view"
+  );
+  const [formData, setFormData] = React.useState<Todo | null>(todo);
+  const [isSaving, setIsSaving] = React.useState(false);
+
+  React.useEffect(() => {
+    if (!todo && id) {
+      const foundTodo = todos.find((t: Todo) => t.id === id);
+      if (foundTodo) {
+        setTodo(foundTodo);
+      }
+    }
+  }, [id, todo, todos]);
+
+  React.useEffect(() => {
+    if (todo) {
+      setFormData(todo);
+    }
+  }, [todo]);
+
+  const handleEdit = () => {
+    setMode("edit");
+    setFormData({ ...todo! });
+  };
+
+  const handleCancel = () => {
+    setMode("view");
+    setFormData(null);
+  };
+
+  const handleSave = async () => {
+    if (formData) {
+      setIsSaving(true);
+      const updatedTodo = await updateTodo(formData.id, {
+        title: formData.title,
+        description: formData.description,
+        completed: formData.completed,
+      });
+      setIsSaving(false);
+
+      if (updatedTodo) {
+        toast.success("Task updated successfully.");
+        setTodo(updatedTodo);
+        setMode("view");
+      }
+    }
+  };
+
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    const { name, value, type } = e.target;
+    setFormData((prev) =>
+      prev
+        ? {
+            ...prev,
+            [name]:
+              type === "checkbox"
+                ? (e.target as HTMLInputElement).checked
+                : value,
+          }
+        : null
+    );
+  };
+
+  const handleStatusChange = (checked: boolean) => {
+    if (formData) {
+      setFormData((prev) =>
+        prev
+          ? {
+              ...prev,
+              completed: checked,
+            }
+          : null
+      );
+      updateStatus(todo?.id || "", checked);
+    }
+  };
+
+  if (isLoading && !todo) {
+    return (
+      <div className={styles.container}>
+        <Button variant="secondary" onClick={() => navigate("/todos")}>
+          <ArrowLeftIcon className={styles.icon} />
+          Back
+        </Button>
+        <div className={styles.skeletonContainer}>
+          <Skeleton height={40} width={300} />
+          <Skeleton height={24} width={150} />
+          <Skeleton height={20} width={200} />
+          <Skeleton height={20} width={180} />
+          <Skeleton height={20} width={220} />
+        </div>
+      </div>
+    );
+  }
+
+  if (!todo) {
+    return (
+      <div className={styles.container}>
+        <Button variant="secondary" onClick={() => navigate("/todos")}>
+          <ArrowLeftIcon className={styles.icon} />
+          Back
+        </Button>
+        <div className={styles.emptyState}>
+          <p>Todo not found</p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className={styles.container}>
+      <div className={styles.backToList}>
+        <Button variant="secondary" onClick={() => navigate("/todos")}>
+          <ArrowLeftIcon className={styles.icon} />
+          Back to List
+        </Button>
+      </div>
+
+      {mode === "view" ? (
+        <div className={styles.viewMode}>
+          <div className={styles.header}>
+            <h1 className={styles.title}>{todo.title}</h1>
+          </div>
+
+          <div className={styles.content}>
+            <div className={styles.section}>
+              <h2 className={styles.sectionTitle}>ID</h2>
+              <p className={styles.sectionContent}>{todo.id}</p>
+            </div>
+
+            <div className={styles.section}>
+              <h2 className={styles.sectionTitle}>Description</h2>
+              <p className={styles.sectionContent}>
+                {todo.description || "No description provided"}
+              </p>
+            </div>
+
+            <div className={styles.section}>
+              <h2 className={styles.sectionTitle}>Status</h2>
+              <Badge
+                variant={todo.completed ? "completed" : "pending"}
+                className={styles.sectionContent}
+              />
+            </div>
+
+            <div className={styles.section}>
+              <h2 className={styles.sectionTitle}>Timestamps</h2>
+              <div className={styles.timestamps}>
+                <div className={styles.timestampItem}>
+                  <span className={styles.label}>Created:</span>
+                  <span className={styles.value}>
+                    {formatDate(todo.createdAt)}
+                  </span>
+                </div>
+                <div className={styles.timestampItem}>
+                  <span className={styles.label}>Last Updated:</span>
+                  <span className={styles.value}>
+                    {formatDate(todo.updatedAt)}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className={styles.actions}>
+            <Button variant="primary" onClick={handleEdit}>
+              Edit
+            </Button>
+            <Button variant="secondary" onClick={() => navigate("/todos")}>
+              Close
+            </Button>
+          </div>
+        </div>
+      ) : (
+        <div className={styles.editMode}>
+          <h2 className={styles.editTitle}>Edit Todo</h2>
+          <form
+            className={styles.form}
+            onSubmit={(e) => {
+              e.preventDefault();
+              handleSave();
+            }}
+          >
+            <div className={styles.formGroup}>
+              <Input
+                label="Title"
+                id="title"
+                name="title"
+                type="text"
+                placeholder="Enter todo title"
+                value={formData?.title || ""}
+                onChange={handleChange}
+                required
+                isRequired
+                className={styles.input}
+              />
+            </div>
+
+            <div className={styles.formGroup}>
+              <Textarea
+                label="Description"
+                id="description"
+                name="description"
+                placeholder="Enter description"
+                value={formData?.description || ""}
+                onChange={handleChange}
+                rows={4}
+                className={styles.textarea}
+              />
+            </div>
+
+            <div className={styles.formGroup}>
+              <Checkbox
+                id="completed"
+                name="completed"
+                label="Mark as completed"
+                checked={formData?.completed || false}
+                onChange={handleStatusChange}
+              />
+            </div>
+
+            <div className={styles.actions}>
+              <Button variant="primary" type="submit" disabled={isSaving}>
+                {isSaving ? "Saving..." : "Save Changes"}
+              </Button>
+              <Button variant="secondary" type="button" onClick={handleCancel}>
+                Cancel
+              </Button>
+            </div>
+          </form>
+        </div>
+      )}
+    </div>
+  );
+}

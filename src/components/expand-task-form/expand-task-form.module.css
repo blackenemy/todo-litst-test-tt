@@ -1,0 +1,122 @@
+.container {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 24px;
+  margin-bottom: 24px;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.icon {
+  width: 20px;
+  height: 20px;
+  color: #6366f1;
+}
+
+.title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #111827;
+  margin: 0;
+}
+
+.inputGroup {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.inputWrapper {
+  flex: 1;
+}
+
+.buttonGroup {
+  display: flex;
+  gap: 8px;
+}
+
+.preview {
+  margin-top: 16px;
+  padding: 16px;
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+}
+
+.previewTitle {
+  font-size: 14px;
+  font-weight: 600;
+  color: #111827;
+  margin: 0 0 8px 0;
+}
+
+.previewDescription {
+  font-size: 14px;
+  color: #6b7280;
+  margin: 0 0 12px 0;
+}
+
+.previewSubtasks {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.previewSubtask {
+  padding-left: 12px;
+  border-left: 2px solid #d1d5db;
+}
+
+.previewSubtaskTitle {
+  font-size: 14px;
+  font-weight: 500;
+  color: #374151;
+  margin: 0 0 6px 0;
+}
+
+.previewActions {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding-left: 12px;
+}
+
+.previewAction {
+  font-size: 13px;
+  color: #6b7280;
+  margin: 0;
+  padding-left: 8px;
+  border-left: 1px solid #e5e7eb;
+}
+
+.previewActions {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.error {
+  margin-top: 16px;
+  padding: 12px;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 6px;
+}
+
+.errorText {
+  font-size: 14px;
+  color: #dc2626;
+  margin: 0;
+}
+
+.actionButtons {
+  display: flex;
+  gap: 8px;
+  margin-top: 16px;
+}
