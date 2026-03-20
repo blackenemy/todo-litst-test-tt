@@ -329,14 +329,12 @@ export default function TodoListsPage() {
           )}
         </div>
         {/* Card View Pagination */}
-        {cardTotalPages > 1 && (
-          <Pagination
-            currentPage={cardCurrentPage}
-            totalPages={cardTotalPages}
-            onPageChange={setCardCurrentPage}
-            siblingCount={1}
-          />
-        )}
+        <Pagination
+          currentPage={cardCurrentPage}
+          totalPages={cardTotalPages}
+          onPageChange={setCardCurrentPage}
+          siblingCount={1}
+        />
       </div>
 
       <div className={styles.section}>
