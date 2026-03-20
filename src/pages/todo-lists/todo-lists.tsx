@@ -1,8 +1,13 @@
 import * as React from "react";
+import Skeleton from "react-loading-skeleton";
 import { useNavigate } from "react-router-dom";
+
 import { toast } from "sonner";
 import { PlusIcon } from "@heroicons/react/24/outline";
-import Skeleton from "react-loading-skeleton";
+
+import { useTodoContext, useStatusContext } from "../../context";
+import styles from "./todo-lists.module.css";
+
 import { Card } from "../../components/card";
 import { Button } from "../../components/button";
 import { Input } from "../../components/input";
@@ -10,16 +15,15 @@ import { Textarea } from "../../components/textarea";
 import { Table } from "../../components/table";
 import { Badge } from "../../components/badge";
 import { StatusOption } from "../../components/option";
-import type { StatusFilterValue } from "../../components/option";
 import { ExpandTaskForm } from "../../components/expand-task-form";
 import { Pagination } from "../../components/pagination";
 import { Dialog } from "../../components/dialog";
-import { useTodoContext, useStatusContext } from "../../context";
+
 import type { TableColumn } from "../../components/table";
 import type { BadgeVariant } from "../../components/badge";
 import type { Todo } from "../../api/todo/types";
 import type { TodoItem } from "../../context/initialTodos";
-import styles from "./todo-lists.module.css";
+import type { StatusFilterValue } from "../../components/option";
 
 export default function TodoListsPage() {
   const navigate = useNavigate();
