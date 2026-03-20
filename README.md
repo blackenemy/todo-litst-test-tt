@@ -13,7 +13,9 @@
    ```sh
    npm run dev
    ```
-   - จะติดตั้งและรัน Ollama (AI backend) อัตโนมัติถ้ายังไม่มีในเครื่อง (macOS เท่านั้น)
+   - จะติดตั้งและรัน Ollama (AI backend) อัตโนมัติถ้ายังไม่มีในเครื่อง (macOS และ Windows)
+   - macOS: ติดตั้งอัตโนมัติผ่าน Homebrew หากยังไม่มี Ollama
+   - Windows: แนะนำให้ติดตั้ง Ollama ด้วย winget หรือดาวน์โหลดจาก https://ollama.com/download หากยังไม่มี (รองรับการรันผ่าน Git Bash หรือ WSL)
    - เปิดเว็บแอปที่ http://localhost:5173
 
 ---
