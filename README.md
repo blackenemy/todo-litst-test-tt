@@ -1,3 +1,23 @@
+# Installation
+
+1. **Clone repository**
+   ```sh
+   git clone <repo-url>
+   cd todo-litst-test-tt
+   ```
+2. **Install dependencies**
+   ```sh
+   npm install
+   ```
+3. **Start development server**
+   ```sh
+   npm run dev
+   ```
+   - จะติดตั้งและรัน Ollama (AI backend) อัตโนมัติถ้ายังไม่มีในเครื่อง (macOS เท่านั้น)
+   - เปิดเว็บแอปที่ http://localhost:5173
+
+---
+
 # Project Architecture — Todo List App
 
 ## Stack
