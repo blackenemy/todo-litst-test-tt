@@ -1,4 +1,4 @@
-import { createContext, useContext, useReducer, useCallback, useEffect } from "react";
+import { createContext, useContext, useReducer, useCallback, useEffect, useRef } from "react";
 import type { ReactNode } from "react";
 import { useGetTodos, useCreateTodo, useUpdateTodo, useDeleteTodo } from "../hooks";
 import type { Todo, CreateTodoInput, UpdateTodoInput } from "../api/todo/types";
@@ -112,6 +112,8 @@ const TodoContext = createContext<TodoContextType | undefined>(undefined);
 
 export function TodoProvider({ children }: { children: ReactNode }) {
   const [state, dispatch] = useReducer(todoReducer, initialState);
+  const stateRef = useRef(state);
+  stateRef.current = state;
 
   const { todos: apiTodos, isLoading: apiLoading, error: apiError, refetch } = useGetTodos();
   const { addTodo: apiCreateTodo, isLoading: createLoading } = useCreateTodo();
@@ -152,9 +154,23 @@ export function TodoProvider({ children }: { children: ReactNode }) {
   }, [apiCreateTodo]);
 
   const updateTodo = useCallback(async (id: string, input: UpdateTodoInput): Promise<Todo | null> => {
+    const currentTodo = stateRef.current.todos.find((t) => t.id === id);
+
+    // Optimistic update so UI reflects change immediately
+    if (currentTodo) {
+      dispatch({ type: "UPDATE_TODO", payload: { todo: { ...currentTodo, ...input } } });
+    }
+
     const updatedTodo = await apiUpdateTodo(id, input);
     if (updatedTodo) {
-      dispatch({ type: "UPDATE_TODO", payload: { todo: updatedTodo } });
+      // Merge to preserve subtasks if mockAPI strips them from the response
+      const finalTodo: Todo = {
+        ...(currentTodo ?? {}),
+        ...input,
+        ...updatedTodo,
+        subtasks: updatedTodo.subtasks ?? input.subtasks ?? currentTodo?.subtasks,
+      };
+      dispatch({ type: "UPDATE_TODO", payload: { todo: finalTodo } });
     }
     return updatedTodo;
   }, [apiUpdateTodo]);

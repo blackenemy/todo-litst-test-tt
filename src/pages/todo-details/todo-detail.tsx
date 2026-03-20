@@ -1,14 +1,21 @@
 import * as React from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
-import { ArrowLeftIcon } from "@heroicons/react/24/outline";
 import Skeleton from "react-loading-skeleton";
+
 import "react-loading-skeleton/dist/skeleton.css";
-import { Button } from "../../components/button";
-import { useTodoContext, useStatusContext } from "../../context";
-import type { Todo } from "../../api/todo/types";
 import styles from "./todo-detail.module.css";
+
+import { useTodoContext } from "../../context";
+
+import { toast } from "sonner";
+import { Button } from "../../components/button";
+import { ArrowLeftIcon } from "@heroicons/react/24/outline";
 import { Input } from "../../components/input";
 import { Textarea } from "../../components/textarea";
+import { Checkbox } from "../../components/checkbox";
+import { Badge } from "../../components/badge";
+
+import type { Todo } from "../../api/todo/types";
 
 interface LocationState {
   todo: Todo;
@@ -32,7 +39,6 @@ export default function TodoDetailPage() {
   const location = useLocation();
   const state = location.state as LocationState | null;
   const { todos, isLoading, updateTodo, updateStatus } = useTodoContext();
-  const statusContext = useStatusContext();
 
   const [todo, setTodo] = React.useState<Todo | null>(state?.todo || null);
   const [mode, setMode] = React.useState<"view" | "edit">(
@@ -77,6 +83,7 @@ export default function TodoDetailPage() {
       setIsSaving(false);
 
       if (updatedTodo) {
+        toast.success("Task updated successfully.");
         setTodo(updatedTodo);
         setMode("view");
       }
@@ -113,8 +120,6 @@ export default function TodoDetailPage() {
       updateStatus(todo?.id || "", checked);
     }
   };
-
-  const statusHistory = todo ? statusContext.getHistoryForTodo(todo.id) : [];
 
   if (isLoading && !todo) {
     return (
@@ -178,9 +183,10 @@ export default function TodoDetailPage() {
 
             <div className={styles.section}>
               <h2 className={styles.sectionTitle}>Status</h2>
-              <p className={styles.sectionContent}>
-                {todo.completed ? "Completed" : "Pending"}
-              </p>
+              <Badge
+                variant={todo.completed ? "completed" : "pending"}
+                className={styles.sectionContent}
+              />
             </div>
 
             <div className={styles.section}>
@@ -199,48 +205,6 @@ export default function TodoDetailPage() {
                   </span>
                 </div>
               </div>
-            </div>
-
-            <div className={styles.section}>
-              <h2 className={styles.sectionTitle}>Status History</h2>
-              {statusHistory.length > 0 ? (
-                <div className={styles.historyList}>
-                  {statusHistory.map(
-                    (
-                      entry: {
-                        id: string;
-                        completed: boolean;
-                        timestamp: number;
-                      },
-                      index: number
-                    ) => (
-                      <div key={index} className={styles.historyItem}>
-                        <div className={styles.historyIcon}>
-                          {entry.completed ? (
-                            <span className={styles.completedIcon}>✓</span>
-                          ) : (
-                            <span className={styles.pendingIcon}>✕</span>
-                          )}
-                        </div>
-                        <div className={styles.historyContent}>
-                          <span className={styles.historyText}>
-                            {entry.completed
-                              ? "Marked as completed"
-                              : "Marked as pending"}
-                          </span>
-                          <span className={styles.historyTime}>
-                            {new Date(entry.timestamp).toLocaleString()}
-                          </span>
-                        </div>
-                      </div>
-                    )
-                  )}
-                </div>
-              ) : (
-                <p className={styles.sectionContent}>
-                  No status changes recorded yet
-                </p>
-              )}
             </div>
           </div>
 
@@ -292,17 +256,13 @@ export default function TodoDetailPage() {
             </div>
 
             <div className={styles.formGroup}>
-              <label className={styles.checkboxLabel} htmlFor="completed">
-                <input
-                  type="checkbox"
-                  id="completed"
-                  name="completed"
-                  className={styles.checkbox}
-                  checked={formData?.completed || false}
-                  onChange={(e) => handleStatusChange(e.target.checked)}
-                />
-                <span>Mark as completed</span>
-              </label>
+              <Checkbox
+                id="completed"
+                name="completed"
+                label="Mark as completed"
+                checked={formData?.completed || false}
+                onChange={handleStatusChange}
+              />
             </div>
 
             <div className={styles.actions}>

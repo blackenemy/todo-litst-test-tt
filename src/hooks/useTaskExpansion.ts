@@ -15,6 +15,19 @@ function generateId(): string {
   return `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
 }
 
+async function checkOllamaHealth(): Promise<void> {
+  try {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 2000);
+    await fetch("http://localhost:11434/", { signal: controller.signal });
+    clearTimeout(timeout);
+  } catch {
+    throw new Error(
+      "Ollama is not running. Start it with: ollama serve"
+    );
+  }
+}
+
 async function callOllama(keyword: string): Promise<OllamaResponse> {
   const response = await fetch("http://localhost:11434/api/generate", {
     method: "POST",
@@ -89,7 +102,9 @@ Return ONLY the JSON object, no markdown, no explanation.`,
     throw new Error("No valid JSON found in Ollama response");
   }
 
-  const jsonString = rawResponse.slice(jsonStart, jsonEnd + 1);
+  const jsonString = rawResponse
+    .slice(jsonStart, jsonEnd + 1)
+    .replace(/,\s*([\]}])/g, "$1"); // remove trailing commas
 
   try {
     return JSON.parse(jsonString) as OllamaResponse;
@@ -126,6 +141,7 @@ export function useTaskExpansion(): UseTaskExpansionReturn {
           : "Create a new task from scratch.";
         const enhancedKeyword = `${contextHint}. User keyword/phrase: "${keyword}"`;
 
+        await checkOllamaHealth();
         const ollamaResponse = await callOllama(enhancedKeyword);
 
         const subtasks: Subtask[] = ollamaResponse.subtasks.map((subtask) => ({

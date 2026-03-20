@@ -1,5 +1,6 @@
 import * as React from "react";
 import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 import { PlusIcon } from "@heroicons/react/24/outline";
 import Skeleton from "react-loading-skeleton";
 import { Card } from "../../components/card";
@@ -8,7 +9,11 @@ import { Input } from "../../components/input";
 import { Textarea } from "../../components/textarea";
 import { Table } from "../../components/table";
 import { Badge } from "../../components/badge";
+import { StatusOption } from "../../components/option";
+import type { StatusFilterValue } from "../../components/option";
 import { ExpandTaskForm } from "../../components/expand-task-form";
+import { Pagination } from "../../components/pagination";
+import { Dialog } from "../../components/dialog";
 import { useTodoContext, useStatusContext } from "../../context";
 import type { TableColumn } from "../../components/table";
 import type { BadgeVariant } from "../../components/badge";
@@ -29,18 +34,59 @@ export default function TodoListsPage() {
     refetch,
   } = useTodoContext();
   const [searchQuery, setSearchQuery] = React.useState("");
+  const [statusFilter, setStatusFilter] =
+    React.useState<StatusFilterValue>("all");
   const [isCreateFormVisible, setIsCreateFormVisible] = React.useState(false);
   const [newTodoTitle, setNewTodoTitle] = React.useState("");
   const [newTodoDescription, setNewTodoDescription] = React.useState("");
   const [titleError, setTitleError] = React.useState("");
   const [isCreating, setIsCreating] = React.useState(false);
+  const [deleteTarget, setDeleteTarget] = React.useState<Todo | null>(null);
+  const [currentPage, setCurrentPage] = React.useState(1);
+  const pageSize = 5;
+  const [cardCurrentPage, setCardCurrentPage] = React.useState(1);
+  const cardPageSize = 6;
 
-  const filteredTodos = todos.filter(
-    (todo: Todo) =>
+  const filteredTodos = todos.filter((todo: Todo) => {
+    const matchesSearch =
       todo.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       (todo.description &&
-        todo.description.toLowerCase().includes(searchQuery.toLowerCase()))
+        todo.description.toLowerCase().includes(searchQuery.toLowerCase()));
+    const matchesStatus =
+      statusFilter === "all" ||
+      (statusFilter === "completed" && todo.completed) ||
+      (statusFilter === "pending" && !todo.completed);
+    return matchesSearch && matchesStatus;
+  });
+
+  // Pagination logic
+  const totalPages = Math.ceil(filteredTodos.length / pageSize) || 1;
+  const paginatedTodos = React.useMemo(
+    () =>
+      filteredTodos.slice((currentPage - 1) * pageSize, currentPage * pageSize),
+    [filteredTodos, currentPage]
   );
+
+  // Card View Pagination
+  const filteredCardTodos = React.useMemo(
+    () =>
+      filteredTodos
+        .filter((todo: Todo) => !todo.completed)
+        .slice(
+          (cardCurrentPage - 1) * cardPageSize,
+          cardCurrentPage * cardPageSize
+        ),
+    [filteredTodos, cardCurrentPage]
+  );
+  const cardTotalPages =
+    Math.ceil(
+      filteredTodos.filter((todo: Todo) => !todo.completed).length /
+        cardPageSize
+    ) || 1;
+
+  React.useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, statusFilter]);
 
   const columns: TableColumn[] = [
     { key: "id", label: "ID", position: "left" },
@@ -73,10 +119,19 @@ export default function TodoListsPage() {
     navigate(`/todo/${todo.id}`, { state: { todo, mode: "edit" } });
   };
 
-  const handleDelete = async (rowData: Record<string, unknown>) => {
-    const todo = rowData as unknown as Todo;
-    if (window.confirm(`Are you sure you want to delete "${todo.title}"?`)) {
-      await deleteTodo(todo.id);
+  const handleDelete = (rowData: Record<string, unknown>) => {
+    setDeleteTarget(rowData as unknown as Todo);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (deleteTarget) {
+      const res = await deleteTodo(deleteTarget.id);
+      if (res) {
+        toast.success("Todo deleted successfully!");
+      } else {
+        toast.error("Failed to delete todo. Please try again.");
+      }
+      setDeleteTarget(null);
     }
   };
 
@@ -100,10 +155,12 @@ export default function TodoListsPage() {
       setNewTodoTitle("");
       setNewTodoDescription("");
       setTitleError("");
+      toast.success("Task created successfully!");
     }
   };
 
   const handleCancelCreate = () => {
+    toast.success("Task creation canceled.");
     setIsCreateFormVisible(false);
     setNewTodoTitle("");
     setNewTodoDescription("");
@@ -115,12 +172,40 @@ export default function TodoListsPage() {
       title: expandedTodo.title,
       description: expandedTodo.description,
       completed: expandedTodo.completed || false,
+      subtasks: expandedTodo.subtasks,
     });
+    toast.success("Task created successfully!");
   };
 
   const handleToggle = async (todoId: string, completed: boolean) => {
     updateStatus(todoId, completed);
     await updateTodo(todoId, { completed });
+    if (completed) {
+      toast.success("Task completed!");
+    }
+  };
+
+  const handleSubtaskToggle = async (
+    todoId: string,
+    subtaskId: string,
+    checked: boolean
+  ) => {
+    const todo = todos.find((t: Todo) => t.id === todoId);
+    if (!todo || !todo.subtasks) return;
+
+    const updatedSubtasks = todo.subtasks.map((st) =>
+      st.id === subtaskId ? { ...st, completed: checked } : st
+    );
+
+    const allCompleted = updatedSubtasks.every((st) => st.completed);
+
+    if (allCompleted) {
+      updateStatus(todoId, true);
+      await updateTodo(todoId, { completed: true, subtasks: updatedSubtasks });
+      toast.success("All subtasks done — task completed!");
+    } else {
+      await updateTodo(todoId, { subtasks: updatedSubtasks });
+    }
   };
 
   if (error) {
@@ -151,7 +236,7 @@ export default function TodoListsPage() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               helperText={
-                isLoading
+                isLoading && todos.length === 0
                   ? "Loading..."
                   : `Found ${filteredTodos.length} of ${todos.length} todos`
               }
@@ -214,7 +299,7 @@ export default function TodoListsPage() {
       <div className={styles.section}>
         <h2 className={styles.sectionTitle}>Card View</h2>
         <div className={styles.cardViewContainer}>
-          {isLoading ? (
+          {isLoading && todos.length === 0 ? (
             Array.from({ length: 3 }).map((_, index) => (
               <div key={index} className={styles.skeletonCard}>
                 <Skeleton height={24} width="60%" />
@@ -224,45 +309,81 @@ export default function TodoListsPage() {
             ))
           ) : filteredTodos.filter((todo: Todo) => !todo.completed).length >
             0 ? (
-            filteredTodos
-              .filter((todo: Todo) => !todo.completed)
-              .map((todo: Todo) => (
-                <Card
-                  key={todo.id}
-                  title={todo.title}
-                  description={todo.description}
-                  completed={todo.completed}
-                  subtasks={todo.subtasks}
-                  onToggle={(checked: boolean) =>
-                    handleToggle(todo.id, checked)
-                  }
-                />
-              ))
+            filteredCardTodos.map((todo: Todo) => (
+              <Card
+                key={todo.id}
+                title={todo.title}
+                description={todo.description}
+                completed={todo.completed}
+                subtasks={todo.subtasks}
+                onToggle={(checked: boolean) => handleToggle(todo.id, checked)}
+                onSubtaskToggle={(subtaskId, checked) =>
+                  handleSubtaskToggle(todo.id, subtaskId, checked)
+                }
+              />
+            ))
           ) : (
             <p className={styles.emptyMessage}>
               No todos found matching your search.
             </p>
           )}
         </div>
+        {/* Card View Pagination */}
+        {cardTotalPages > 1 && (
+          <Pagination
+            currentPage={cardCurrentPage}
+            totalPages={cardTotalPages}
+            onPageChange={setCardCurrentPage}
+            siblingCount={1}
+          />
+        )}
       </div>
 
       <div className={styles.section}>
         <h2 className={styles.sectionTitle}>Table View</h2>
-        {isLoading ? (
+        {isLoading && todos.length === 0 ? (
           <div className={styles.skeletonTable}>
             <Skeleton height={40} count={5} />
           </div>
         ) : (
           <Table
             columns={columns}
-            data={filteredTodos as unknown as Record<string, unknown>[]}
+            data={paginatedTodos as unknown as Record<string, unknown>[]}
             onView={handleView}
             onEdit={handleEdit}
             onDelete={handleDelete}
             emptyMessage="No todos found. Try adjusting your search."
+            toolbar={
+              <StatusOption value={statusFilter} onChange={setStatusFilter} />
+            }
+            pagination={{
+              currentPage,
+              totalPages,
+              onPageChange: setCurrentPage,
+            }}
           />
         )}
       </div>
+      <Dialog
+        open={deleteTarget !== null}
+        onOpenChange={(open) => {
+          if (!open) setDeleteTarget(null);
+        }}
+        title="Delete Todo"
+        description={`Are you sure you want to delete "${deleteTarget?.title}"? `}
+        footer={
+          <>
+            <Button variant="secondary" onClick={() => setDeleteTarget(null)}>
+              Cancel
+            </Button>
+            <Button variant="danger" onClick={handleConfirmDelete}>
+              Delete
+            </Button>
+          </>
+        }
+      >
+        {null}
+      </Dialog>
     </div>
   );
 }

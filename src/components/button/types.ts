@@ -1,6 +1,11 @@
 import type { ButtonHTMLAttributes } from "react";
 
-export type ButtonVariant = "primary" | "secondary" | "text" | "icon";
+export type ButtonVariant =
+  | "primary"
+  | "secondary"
+  | "danger"
+  | "text"
+  | "icon";
 export type ButtonSize = "sm" | "md" | "lg";
 export type IconColor = "view" | "edit" | "delete";
 

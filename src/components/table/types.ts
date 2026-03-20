@@ -1,3 +1,5 @@
+import type React from 'react';
+
 export type ColumnPosition = 'left' | 'middle' | 'right';
 
 export interface TableColumn {
@@ -15,4 +17,10 @@ export interface TableProps {
   onDelete?: (rowData: Record<string, unknown>) => void;
   isLoading?: boolean;
   emptyMessage?: string;
+  toolbar?: React.ReactNode;
+  pagination?: {
+    currentPage: number;
+    totalPages: number;
+    onPageChange: (page: number) => void;
+  };
 }

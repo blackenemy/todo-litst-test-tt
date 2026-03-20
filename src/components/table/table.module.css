@@ -6,6 +6,13 @@
   background-color: white;
 }
 
+.toolbar {
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
 .table {
   width: 100%;
   border-collapse: collapse;

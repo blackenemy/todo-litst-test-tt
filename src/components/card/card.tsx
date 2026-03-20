@@ -12,7 +12,6 @@ function Card({
   subtasks,
   onToggle,
   onSubtaskToggle,
-  onActionToggle,
 }: CardProps) {
   const [isChecked, setIsChecked] = useState(completed);
   const [isSubtasksExpanded, setIsSubtasksExpanded] = useState(false);
@@ -24,10 +23,6 @@ function Card({
 
   const handleSubtaskToggle = (subtaskId: string, completed: boolean) => {
     onSubtaskToggle?.(subtaskId, completed);
-  };
-
-  const handleActionToggle = (subtaskId: string, actionId: string, completed: boolean) => {
-    onActionToggle?.(subtaskId, actionId, completed);
   };
 
   return (
@@ -72,7 +67,9 @@ function Card({
                         handleSubtaskToggle(subtask.id, checked as boolean)
                       }
                     >
-                      <CheckboxPrimitive.Indicator className={styles.checkboxIndicator}>
+                      <CheckboxPrimitive.Indicator
+                        className={styles.checkboxIndicator}
+                      >
                         <CheckIcon />
                       </CheckboxPrimitive.Indicator>
                     </CheckboxPrimitive.Root>
@@ -83,18 +80,9 @@ function Card({
                     <div className={styles.actionsList}>
                       {subtask.actions.map((action) => (
                         <div key={action.id} className={styles.action}>
-                          <CheckboxPrimitive.Root
-                            className={styles.actionCheckboxRoot}
-                            checked={action.completed}
-                            onCheckedChange={(checked) =>
-                              handleActionToggle(subtask.id, action.id, checked as boolean)
-                            }
-                          >
-                            <CheckboxPrimitive.Indicator className={styles.checkboxIndicator}>
-                              <CheckIcon />
-                            </CheckboxPrimitive.Indicator>
-                          </CheckboxPrimitive.Root>
-                          <span className={styles.actionTitle}>{action.title}</span>
+                          <span className={styles.actionTitle}>
+                            {action.title}
+                          </span>
                         </div>
                       ))}
                     </div>

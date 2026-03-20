@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 import type { TableProps, ColumnPosition } from './types';
 import { TableButton } from '../tableButton';
+import { Pagination } from '../pagination';
 import styles from './table.module.css';
 
 function Table({
@@ -11,6 +12,8 @@ function Table({
   onDelete,
   isLoading = false,
   emptyMessage = 'No data available',
+  toolbar,
+  pagination,
 }: TableProps) {
   if (!data || data.length === 0) {
     return (
@@ -60,6 +63,7 @@ function Table({
 
   return (
     <div className={styles.tableWrapper}>
+      {toolbar && <div className={styles.toolbar}>{toolbar}</div>}
       <table className={styles.table}>
         <thead>
           <tr>
@@ -100,6 +104,13 @@ function Table({
           ))}
         </tbody>
       </table>
+      {pagination && (
+        <Pagination
+          currentPage={pagination.currentPage}
+          totalPages={pagination.totalPages}
+          onPageChange={pagination.onPageChange}
+        />
+      )}
     </div>
   );
 }

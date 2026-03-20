@@ -35,7 +35,10 @@ const initialState: StatusState = {
   currentStatus: new Map(),
 };
 
-const statusReducer = (state: StatusState, action: StatusAction): StatusState => {
+const statusReducer = (
+  state: StatusState,
+  action: StatusAction
+): StatusState => {
   switch (action.type) {
     case "UPDATE_STATUS": {
       if (!action.payload?.id) return state;
@@ -73,7 +76,9 @@ const statusReducer = (state: StatusState, action: StatusAction): StatusState =>
   }
 };
 
-export const StatusContext = createContext<StatusContextType | undefined>(undefined);
+export const StatusContext = createContext<StatusContextType | undefined>(
+  undefined
+);
 
 export function StatusProvider({ children }: { children: ReactNode }) {
   const [state, dispatch] = useReducer(statusReducer, initialState);
@@ -114,9 +119,7 @@ export function StatusProvider({ children }: { children: ReactNode }) {
 export function useStatusContext(): StatusContextType {
   const context = useContext(StatusContext);
   if (!context) {
-    throw new Error(
-      "useStatusContext must be used within a StatusProvider"
-    );
+    throw new Error("useStatusContext must be used within a StatusProvider");
   }
   return context;
 }
