@@ -1,4 +1,4 @@
-import * as React from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { toast } from "sonner";
@@ -36,18 +36,17 @@ export default function TodoListsPage() {
     deleteTodo,
     refetch,
   } = useTodoContext();
-  const [searchQuery, setSearchQuery] = React.useState("");
-  const [statusFilter, setStatusFilter] =
-    React.useState<StatusFilterValue>("all");
-  const [isCreateFormVisible, setIsCreateFormVisible] = React.useState(false);
-  const [newTodoTitle, setNewTodoTitle] = React.useState("");
-  const [newTodoDescription, setNewTodoDescription] = React.useState("");
-  const [titleError, setTitleError] = React.useState("");
-  const [isCreating, setIsCreating] = React.useState(false);
-  const [deleteTarget, setDeleteTarget] = React.useState<Todo | null>(null);
-  const [currentPage, setCurrentPage] = React.useState(1);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState<StatusFilterValue>("all");
+  const [isCreateFormVisible, setIsCreateFormVisible] = useState(false);
+  const [newTodoTitle, setNewTodoTitle] = useState("");
+  const [newTodoDescription, setNewTodoDescription] = useState("");
+  const [titleError, setTitleError] = useState("");
+  const [isCreating, setIsCreating] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState<Todo | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 5;
-  const [cardCurrentPage, setCardCurrentPage] = React.useState(1);
+  const [cardCurrentPage, setCardCurrentPage] = useState(1);
   const cardPageSize = 6;
 
   const filteredTodos = todos.filter((todo: Todo) => {
@@ -67,7 +66,7 @@ export default function TodoListsPage() {
   const paginatedTodos = React.useMemo(
     () =>
       filteredTodos.slice((currentPage - 1) * pageSize, currentPage * pageSize),
-    [filteredTodos, currentPage]
+    [filteredTodos, currentPage],
   );
 
   // Card View Pagination
@@ -77,14 +76,14 @@ export default function TodoListsPage() {
         .filter((todo: Todo) => !todo.completed)
         .slice(
           (cardCurrentPage - 1) * cardPageSize,
-          cardCurrentPage * cardPageSize
+          cardCurrentPage * cardPageSize,
         ),
-    [filteredTodos, cardCurrentPage]
+    [filteredTodos, cardCurrentPage],
   );
   const cardTotalPages =
     Math.ceil(
       filteredTodos.filter((todo: Todo) => !todo.completed).length /
-        cardPageSize
+        cardPageSize,
     ) || 1;
 
   React.useEffect(() => {
@@ -191,13 +190,13 @@ export default function TodoListsPage() {
   const handleSubtaskToggle = async (
     todoId: string,
     subtaskId: string,
-    checked: boolean
+    checked: boolean,
   ) => {
     const todo = todos.find((t: Todo) => t.id === todoId);
     if (!todo || !todo.subtasks) return;
 
     const updatedSubtasks = todo.subtasks.map((st) =>
-      st.id === subtaskId ? { ...st, completed: checked } : st
+      st.id === subtaskId ? { ...st, completed: checked } : st,
     );
 
     const allCompleted = updatedSubtasks.every((st) => st.completed);

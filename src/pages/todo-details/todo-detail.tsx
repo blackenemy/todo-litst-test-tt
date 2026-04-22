@@ -1,4 +1,4 @@
-import * as React from "react";
+import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import Skeleton from "react-loading-skeleton";
 
@@ -40,14 +40,12 @@ export default function TodoDetailPage() {
   const state = location.state as LocationState | null;
   const { todos, isLoading, updateTodo, updateStatus } = useTodoContext();
 
-  const [todo, setTodo] = React.useState<Todo | null>(state?.todo || null);
-  const [mode, setMode] = React.useState<"view" | "edit">(
-    state?.mode || "view"
-  );
-  const [formData, setFormData] = React.useState<Todo | null>(todo);
-  const [isSaving, setIsSaving] = React.useState(false);
+  const [todo, setTodo] = useState<Todo | null>(state?.todo || null);
+  const [mode, setMode] = useState<"view" | "edit">(state?.mode || "view");
+  const [formData, setFormData] = useState<Todo | null>(todo);
+  const [isSaving, setIsSaving] = useState(false);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (!todo && id) {
       const foundTodo = todos.find((t: Todo) => t.id === id);
       if (foundTodo) {
@@ -56,7 +54,7 @@ export default function TodoDetailPage() {
     }
   }, [id, todo, todos]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (todo) {
       setFormData(todo);
     }
@@ -91,7 +89,7 @@ export default function TodoDetailPage() {
   };
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
     const { name, value, type } = e.target;
     setFormData((prev) =>
@@ -103,7 +101,7 @@ export default function TodoDetailPage() {
                 ? (e.target as HTMLInputElement).checked
                 : value,
           }
-        : null
+        : null,
     );
   };
 
@@ -115,7 +113,7 @@ export default function TodoDetailPage() {
               ...prev,
               completed: checked,
             }
-          : null
+          : null,
       );
       updateStatus(todo?.id || "", checked);
     }
